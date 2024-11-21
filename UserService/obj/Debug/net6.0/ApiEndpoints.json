@@ -1,0 +1,42 @@
+[
+  {
+    "ContainingType": "UserService.Controllers.UserController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkItemService.Controllers.WorkItemController",
+    "Method": "GetWorkItems",
+    "RelativePath": "api/workitems",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkItemService.Controllers.WorkItemController",
+    "Method": "DistributeWorkItems",
+    "RelativePath": "api/workitems/distribute",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WorkItemService.Controllers.WorkItemController",
+    "Method": "GetUsersFromUserService",
+    "RelativePath": "api/workitems/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

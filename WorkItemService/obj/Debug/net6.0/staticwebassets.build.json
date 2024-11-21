@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "DJgfGMqTC3mFZXBtzT7YzhcTNy3UJKPPdGGjw3l4zbQ=",
+  "Source": "WorkItemService",
+  "BasePath": "_content/WorkItemService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

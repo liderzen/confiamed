@@ -1,0 +1,5 @@
+C:\repos\GaloQ\MicroservicesSolution\WorkItemService\obj\Debug\net6.0\staticwebassets.build.json
+C:\repos\GaloQ\MicroservicesSolution\WorkItemService\obj\Debug\net6.0\staticwebassets.build.json
+C:\repos\GaloQ\MicroservicesSolution\WorkItemService\obj\Debug\net6.0\staticwebassets.build.json
+C:\repos\GaloQ\MicroservicesSolution\WorkItemService\obj\Debug\net6.0\staticwebassets.build.json
+C:\repos\GaloQ\MicroservicesSolution\WorkItemService\obj\Debug\net6.0\staticwebassets.build.json
