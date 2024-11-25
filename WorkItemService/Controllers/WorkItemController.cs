@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using WorkItemService.Entities;
+using WorkItemService.BLL.Interfaces;
+using WorkItemService.DAL.Entities;
 
 namespace WorkItemService.Controllers
 {
@@ -9,118 +10,76 @@ namespace WorkItemService.Controllers
     public class WorkItemController : ControllerBase
     {
 
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<WorkItemController> _logger;
+        private readonly IWorkItemService _workItemService;
 
-        private readonly List<WorkItem> _workItems;
-
-        public WorkItemController(IHttpClientFactory httpClientFactory, ILogger<WorkItemController> logger)
+        public WorkItemController(IWorkItemService workItemService)
         {
-            _httpClient = httpClientFactory.CreateClient("UserService");
-            _logger = logger;
+            _workItemService = workItemService;
         }
-
 
         [HttpGet]
-        public IActionResult GetWorkItems()
+        public ActionResult<List<WorkItem>> GetAll()
         {
-            /*var items = new List<object>
-            {
-                new { Title = "Error login", DueDate = "2024-11-22", Priority = "High" },
-                new { Title = "Error dashboard", DueDate = "2024-11-28", Priority = "Low" }
-            };*/
-
-            return Ok(_workItems);
+            return Ok(_workItemService.GetAllWorkItems());
         }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsersFromUserService()
+        [HttpGet("{id}")]
+        public ActionResult<WorkItem> GetById(int id)
         {
-            var response = await _httpClient.GetAsync("api/users");
+            var workItem = _workItemService.GetWorkItemById(id);
 
-            if (!response.IsSuccessStatusCode)
+            if (workItem == null)
             {
-                return StatusCode((int) response.StatusCode, "Error al consultar el servicio: UserService");
+                return NotFound();
             }
 
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var users = JsonSerializer.Deserialize<List<User>>(responseBody, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            return Ok(users);
+            return Ok(workItem);
         }
 
-        [HttpPost("distribute")]
-        public async Task<IActionResult> DistributeWorkItems()
+        [HttpPost]
+        public IActionResult Add(WorkItem workItem)
         {
-            var response = await GetUsersFromUserService() as OkObjectResult;
-            var users = response?.Value as List<User>;
-
-            if (users == null || !users.Any())
+            try
             {
-                return BadRequest("No existen usuarios disponibles.");
+                _workItemService.AddWorkItem(workItem);
+                return CreatedAtAction(nameof(GetById), new { id = workItem.Id }, workItem);
             }
-
-            DistributeWorkItems(users, _workItems);
-            return Ok(new { Message = "Ítems distribuidos correctamente.", Users = users });
-        }
-
-        private void DistributeWorkItems(List<User> users, List<WorkItem> workItems)
-        {
-            var now = DateTime.Now;
-
-            // Ítems urgentes
-            var urgentItems = workItems
-                .Where(item => !item.IsCompleted && (item.DueDate - now).TotalDays < 3)
-                .OrderBy(item => item.DueDate)
-                .ToList();
-
-            var relevantItems = workItems
-                .Where(item => !item.IsCompleted && (item.DueDate - now).TotalDays >= 3 && item.Relevance == "Alta")
-                .OrderBy(item => item.DueDate)
-                .ToList();
-
-            // Urgentes
-            foreach (var item in urgentItems)
+            catch (ArgumentException ex)
             {
-                var user = GetUserWithLeastWorkItems(users);
-                if (user != null)
-                {
-                    item.AssignedUser = user.Username;
-                    user.WorkItems.Add(item);
-                }
-            }
-
-            // Relevantes
-            foreach (var item in relevantItems)
-            {
-                var user = GetUserWithLeastWorkItems(users);
-                if (user != null)
-                {
-                    item.AssignedUser = user.Username;
-                    user.WorkItems.Add(item);
-                }
-            }
-
-            // Pendientes
-            foreach (var user in users)
-            {
-                user.WorkItems = user.WorkItems
-                    .Where(workItem => !workItem.IsCompleted)
-                    .OrderBy(workItem => workItem.DueDate)
-                    .ToList();
+                return BadRequest(ex.Message);
             }
         }
 
-        private User GetUserWithLeastWorkItems(List<User> users)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, WorkItem workItem)
         {
-            return users
-                .Where(user => user.WorkItems.Count(workItem => !workItem.IsCompleted) <= 3)
-                .OrderBy(user => user.WorkItems.Count(workItem => !workItem.IsCompleted))
-                .FirstOrDefault();
+            if (id != workItem.Id)
+            {
+                return BadRequest("El ID no coincide.");
+            }
+
+            try
+            {
+                _workItemService.UpdateWorkItem(workItem);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            _workItemService.DeleteWorkItem(id);
+            return NoContent();
+        }
+
+        [HttpGet("pending/{userId}")]
+        public ActionResult<List<WorkItem>> GetPendingByUserId(int userId)
+        {
+            return Ok(_workItemService.GetPendingWorkItemsByUserId(userId));
         }
 
     }
